@@ -1,0 +1,35 @@
+{
+  "name": "epixcloud",
+  "main": "epixcloud.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/BrandwatchLtd/epixcloud",
+  "authors": [
+    "Dan Neame <dan@brandwatch.com>"
+  ],
+  "description": "TOPICS CLOUD, HOOO!",
+  "keywords": [
+    "cloud",
+    "topics",
+    "epix"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "lib/vendor",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "mocha": "~1.13.0",
+    "expectations": "~0.2.5",
+    "require-css": "~0.0.8",
+    "sinonjs": "~1.7.1"
+  },
+  "dependencies": {
+    "requirejs": ">=2.1.0",
+    "jquery": ">=1.7.2",
+    "underscore": ">=1.3.0"
+  }
+}

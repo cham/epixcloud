@@ -1,0 +1,62 @@
+@font-face {
+    font-family: 'BPreplay';
+    src: url('fonts/bpreplay/BPreplay-webfont.eot');
+    src: url('fonts/bpreplay/BPreplay-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/bpreplay/BPreplay-webfont.woff') format('woff'),
+         url('fonts/bpreplay/BPreplay-webfont.ttf') format('truetype'),
+         url('fonts/bpreplay/BPreplay-webfont.svg#BPreplayRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.cloud {
+    color: #555;
+    width: 800px;
+}
+.epixword {
+    font-weight: bold;
+    white-space: nowrap;
+    font-family: 'BPreplay', Arial, sans-serif;
+}
+.epixweight-1 {
+    font-size: 11px;
+    line-height: 11px;
+}
+.epixweight-2 {
+    font-size: 13px;
+    line-height: 13px;
+}
+.epixweight-3 {
+    font-size: 15px;
+    line-height: 15px;
+}
+.epixweight-4 {
+    font-size: 18px;
+    line-height: 18px;
+}
+.epixweight-5 {
+    font-size: 21px;
+    line-height: 21px;
+}
+.epixweight-6 {
+    font-size: 24px;
+    line-height: 24px;
+}
+.epixweight-7 {
+    font-size: 27px;
+    line-height: 27px;
+}
+.epixweight-8 {
+    font-size: 30px;
+    line-height: 30px;
+}
+.epixweight-9 {
+    font-size: 33px;
+    line-height: 33px;
+}
+.epixweight-10 {
+    font-size: 36px;
+    line-height: 36px;
+}
+.cloud .topic-context-menu {
+    line-height: 10px;
+}
