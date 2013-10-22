@@ -10,6 +10,7 @@ Requires $, Underscore.js and Require.js
 TOPICS CLOUD, HOOOOOO!
 
 #### required options:
+```
    topics               Array   An array of topic object in the following format:
        {
          weight         Number  required  any positive value, range is normalised to a linear scale of 0 to 10
@@ -22,12 +23,13 @@ TOPICS CLOUD, HOOOOOO!
        }
    $el                  $     The container for the cloud. Must have a defined width and height,
                               position: relative will be set programatically
+```
 
 #### optional options (!)
-   * wordClass            String  Class name given to all topics in the cloud
-   * weightClass          String  Prepended to the class used for the normalised weight (0 to 10)
-   * idHead               String  The head of the ID for each topic
-   * async                Bool    If set true then the cloud runs asynchronously, but you probably don't need this
+   * **wordClass**            *String*  Class name given to all topics in the cloud
+   * **weightClass**          *String*  Prepended to the class used for the normalised weight (0 to 10)
+   * **idHead**               *String*  The head of the ID for each topic
+   * **async**                *Bool*    If set true then the cloud runs asynchronously, but you probably don't need this
 
 ### Example Usage:
 
@@ -38,7 +40,7 @@ TOPICS CLOUD, HOOOOOO!
    }).render();
 ```
 
-```
+<pre>
                                             .-.
                                         .-.( ; )-.
                                        ( ;(); ).-.)
@@ -88,4 +90,4 @@ TOPICS CLOUD, HOOOOOO!
    |.-.   .-.   .-.   .-.   .-.   .-.   .-.   .-.   .-.   .-. | _.-'
    |.-.`-'.-.`-'.-.`-'.-.`-'.-.`-'.-.`-'.-.`-'.-.`-'.-.`-'_.-'
    '   `-'   `-'   `-'   `-'   `-'   `-'   `-'   `-'   `-'
-```
+</pre>
