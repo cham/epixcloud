@@ -1,7 +1,7 @@
 {
   "name": "epixcloud",
   "main": "epixcloud.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/BrandwatchLtd/epixcloud",
   "authors": [
     "Dan Neame <dan@brandwatch.com>"
