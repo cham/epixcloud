@@ -1,7 +1,7 @@
 define([
     'jquery',
     'epixcloud',
-    'css!../css/epixcloud.lol.css'
+    'css!../css/epixcloud.css'
 ], function(
     $,
     EpixCloud
