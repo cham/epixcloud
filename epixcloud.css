@@ -1,21 +1,6 @@
-@font-face {
-    font-family: 'BPreplay';
-    src: url('fonts/bpreplay/BPreplay-webfont.eot');
-    src: url('fonts/bpreplay/BPreplay-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/bpreplay/BPreplay-webfont.woff') format('woff'),
-         url('fonts/bpreplay/BPreplay-webfont.ttf') format('truetype'),
-         url('fonts/bpreplay/BPreplay-webfont.svg#BPreplayRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
 .cloud {
-    color: #555;
-    width: 800px;
 }
 .epixword {
-    font-weight: bold;
-    white-space: nowrap;
-    font-family: 'BPreplay', Arial, sans-serif;
 }
 .epixweight-1 {
     font-size: 11px;
@@ -56,7 +41,4 @@
 .epixweight-10 {
     font-size: 36px;
     line-height: 36px;
-}
-.cloud .topic-context-menu {
-    line-height: 10px;
 }
