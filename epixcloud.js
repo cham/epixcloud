@@ -24,6 +24,8 @@
  *   weightClass          String  Prepended to the class used for the normalised weight (0 to 10)
  *   idHead               String  The head of the ID for each topic
  *   async                Bool    If set true then the cloud runs asynchronously, but you probably don't need this
+ *   noscale              Bool    If true then the topics cloud will not attempt to auto-scale to it's container
+ *   doge                 Bool    If true then the topics cloud will look like the doge meme
  *
  * Example Usage:
  *
@@ -86,6 +88,8 @@
 define(['jquery', 'underscore'], function($, _){
     'use strict';
 
+    var dogeWords = ['such', 'very', 'wow', 'so', 'omg', 'nice'];
+
     // intersection algorithms
     function lineIntersection(x1, y1, x2, y2, x3, y3, x4, y4) {
         var d = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4),
@@ -118,17 +122,34 @@ define(['jquery', 'underscore'], function($, _){
 
         this.topics = options.topics;
         this.$el = options.$el;
-        this.$el.css({position:'relative'});
+        this.$el.css({
+            position:'relative',
+            'margin-top': 0,
+            'margin-left': 0,
+            '-webkit-transform': 'scale(1)',
+            '-moz-transform': 'scale(1)',
+            'transform': 'scale(1)'
+        });
 
         this.wordClass = options.wordClass || 'epixword';
         this.weightClass = options.weightClass || 'epixweight-';
         this.idHead = options.idHead || 'epixcloud-';
+        this.noscale = !!options.noscale;
+        this.doge = !!options.doge;
+
+        if(this.doge){
+            this.$el.css({
+                'background-image': 'url(http://upload.wikimedia.org/wikipedia/en/4/4e/Shibe_Inu_Doge_meme.jpg)',
+                'background-size': '100%'
+            });
+        }
 
         this.init();
     }
 
     EpixCloud.prototype.init = function(){
-        var self = this;
+        var self = this,
+            dogeFactor = 0.5;
 
         this.$el.empty();
 
@@ -158,6 +179,16 @@ define(['jquery', 'underscore'], function($, _){
                 topic.adjustedWeight = self.getAdjustedWeight(topic);
             });
         }
+
+        // such doge
+        if(this.doge){
+            this.topics = _(this.topics).map(function(topic){
+                if(Math.random() > dogeFactor){
+                    topic.text = dogeWords[Math.floor(Math.random()*dogeWords.length)] + ' ' + topic.text;
+                }
+                return topic;
+            });
+        }
     };
 
     EpixCloud.prototype.measureTopicBox = function(topic){
@@ -165,14 +196,19 @@ define(['jquery', 'underscore'], function($, _){
         var $m = $('<span class="'+this.wordClass+' '+this.weightClass+''+this.getAdjustedWeight(topic)+'">'+
                         '<a>'+topic.text+'</a>'+
                     '</span>'),
-            w,h;
+            w, h, f;
 
         this.$el.append($m);
         w = $m.outerWidth();
         h = $m.outerHeight();
+        f = $m.css('font-size');
         $m.remove();
 
-        return {width:w,height:h};
+        return {
+            width: w,
+            height: h,
+            fontSize: f
+        };
     };
 
     EpixCloud.prototype.calculateFigureSpace = function(){
@@ -248,15 +284,71 @@ define(['jquery', 'underscore'], function($, _){
             url = topic.url || '#',
             title = topic.title || topic.text,
             customClass = topic.customClass || '',
+            dogeCss = this.doge ? 'font-weight:bold;font-family:\'Comic Sans MS\';' : '',
+            dogeColour = this.doge ? 'color:' + (Math.random() < 0.5 ? 'red' : 'blue') : '',
             $topicSpan = $('<span id="'+this.idHead+''+topicIndex+'" '+
                                 'class="'+this.wordClass+' '+this.weightClass+''+weight+' '+customClass+'" '+
-                                'style="position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;">'+
-                                    '<a href="'+url+'" title="'+title+'">'+topic.text+'</a>'+
+                                'style="position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;'+dogeCss+'">'+
+                                    '<a href="'+url+'" title="'+title+'" style="'+ dogeColour +'">'+topic.text+'</a>'+
                                 '</span>').data(topicData);
 
         if(coords){
             this.$el.append($topicSpan);
         }
+    };
+
+    EpixCloud.prototype.getCloudBB = function(){
+        var bb = [Infinity,Infinity,-Infinity,-Infinity]; //[left,top,right,bottom]
+
+        this.$el.find('.' + this.wordClass).each(function(){
+            var $this = $(this),
+                pos = $this.position(),
+                w = $this.outerWidth(),
+                h = $this.outerHeight(),
+                t = pos.top,
+                l = pos.left,
+                r = l + w,
+                b = t + h;
+
+            if(l < bb[0]){
+                bb[0] = l;
+            }
+            if(t < bb[1]){
+                bb[1] = t;
+            }
+            if(r > bb[2]){
+              bb[2] = r;
+            }
+            if(b > bb[3]){
+              bb[3] = b;
+            }
+        });
+
+        return bb;
+    };
+
+    EpixCloud.prototype.autoFit = function(){
+        var allTopicsBB = this.getCloudBB(),
+            diffW = 1, diffH = 1,
+            canvasW = this.$el.outerWidth(),
+            canvasH = this.$el.outerHeight(),
+            boxW = allTopicsBB[2] - allTopicsBB[0],
+            boxH = allTopicsBB[3] - allTopicsBB[1],
+            padding = canvasW > canvasH ? (canvasH * 0.1) : (canvasW * 0.1);
+
+        canvasW -= 2*padding;
+        canvasH -= 2*padding;
+        diffW = Math.floor(Math.abs(canvasW / boxW) * 100) / 100;
+        diffH = Math.floor(Math.abs(canvasH / boxH) * 100) / 100;
+
+        // center and scale
+        this.$el.css({
+          'margin-top': Math.floor(((canvasH - boxH) / 2) - allTopicsBB[1] + padding),
+          'margin-left': Math.floor(((canvasW - boxW) / 2) - allTopicsBB[0] + padding),
+          '-webkit-transform': 'scale(' + (diffW > diffH ? diffH : diffW) + ')',
+          '-moz-transform': 'scale(' + (diffW > diffH ? diffH : diffW) + ')',
+          'transform': 'scale(' + (diffW > diffH ? diffH : diffW) + ')'
+        });
     };
 
     EpixCloud.prototype.render = function(){
@@ -275,6 +367,11 @@ define(['jquery', 'underscore'], function($, _){
         _(this.topics).each(function(topic,i){
             self.placeTopic(topic,i);
         });
+
+        // cast yon eye o'er the battlefield
+        if(!this.noscale){
+            this.autoFit();
+        }
 
         return this;
     };
