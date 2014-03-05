@@ -5,25 +5,27 @@
  *
  * TOPICS CLOUD, HOOOOOO!
  *
+ * version 0.2
+ *
  * required options:
  *   topics               Array   An array of topic object in the following format:
  *       {
- *         weight         Number  required  any positive value, range is normalised to a linear scale of 0 to 10
- *         text           String  required  the topic text, ideally this should be one or two words
- *         url            String  optional  the URL to apply on the A element wrapping the topic text, defaults to #
- *         title          String  optional  the TITLE attribute to apply to the wrapping A element, defaults to topic text
- *         customClass    String  optional  this string is appended to the class name given to the span representing the topic in the cloud
- *         dataAttributes Object  optional  any data-X attributes that should be applied to the SPAN wrapping the topic.
-                                            Applied as key-value pairs
+ *         weight         Number  required any positive value, range is normalised to a linear scale of 0 to 10
+ *         text           String  required the topic text, ideally this should be one or two words
+ *         url            String  optional the URL to apply on the A element wrapping the topic text, defaults to #
+ *         title          String  optional the TITLE attribute to apply to the wrapping A element, defaults to topic text
+ *         customClass    String  optional this string is appended to the class name given to the span representing the topic in the cloud
+ *         dataAttributes Object  optional any data-X attributes that should be applied to the SPAN wrapping the topic, as key-value pairs
  *       }
- *   $el                  $     The container for the cloud. Must have a defined width and height,
-                                position: relative will be set programatically
+ *   $el                  jQuery  The container for the cloud. Must have a defined width and height, position: relative will be set
  *
  * optional options (!)
  *   wordClass            String  Class name given to all topics in the cloud
  *   weightClass          String  Prepended to the class used for the normalised weight (0 to 10)
  *   idHead               String  The head of the ID for each topic
  *   async                Bool    If set true then the cloud runs asynchronously, but you probably don't need this
+ *   noscale              Bool    If true then the cloud doesn't fit to it's container
+ *   doge                 Bool    VERY DOGE, SUCH CLOUD
  *
  * Example Usage:
  *
