@@ -25,7 +25,6 @@
  *   idHead               String  The head of the ID for each topic
  *   async                Bool    If set true then the cloud runs asynchronously, but you probably don't need this
  *   noscale              Bool    If true then the cloud doesn't fit to it's container
- *   doge                 Bool    VERY DOGE, SUCH CLOUD
  *
  * Example Usage:
  *
@@ -88,8 +87,6 @@
 define(['jquery', 'underscore'], function($, _){
     'use strict';
 
-    var dogeWords = ['such', 'very', 'wow', 'so', 'omg', 'nice'];
-
     // intersection algorithms
     function lineIntersection(x1, y1, x2, y2, x3, y3, x4, y4) {
         var d = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4),
@@ -135,21 +132,12 @@ define(['jquery', 'underscore'], function($, _){
         this.weightClass = options.weightClass || 'epixweight-';
         this.idHead = options.idHead || 'epixcloud-';
         this.noscale = !!options.noscale;
-        this.doge = !!options.doge;
-
-        if(this.doge){
-            this.$el.css({
-                'background-image': 'url(http://upload.wikimedia.org/wikipedia/en/4/4e/Shibe_Inu_Doge_meme.jpg)',
-                'background-size': '100%'
-            });
-        }
 
         this.init();
     }
 
     EpixCloud.prototype.init = function(){
-        var self = this,
-            dogeFactor = 0.5;
+        var self = this;
 
         this.$el.empty();
 
@@ -177,16 +165,6 @@ define(['jquery', 'underscore'], function($, _){
         }else{
             _(this.topics).each(function(topic){
                 topic.adjustedWeight = self.getAdjustedWeight(topic);
-            });
-        }
-
-        // such doge
-        if(this.doge){
-            this.topics = _(this.topics).map(function(topic){
-                if(Math.random() > dogeFactor){
-                    topic.text = dogeWords[Math.floor(Math.random()*dogeWords.length)] + ' ' + topic.text;
-                }
-                return topic;
             });
         }
     };
@@ -284,12 +262,10 @@ define(['jquery', 'underscore'], function($, _){
             url = topic.url || '#',
             title = topic.title || topic.text,
             customClass = topic.customClass || '',
-            dogeCss = this.doge ? 'font-weight:bold;font-family:\'Comic Sans MS\';' : '',
-            dogeColour = this.doge ? 'color:' + (Math.random() < 0.5 ? 'red' : 'blue') : '',
             $topicSpan = $('<span id="'+this.idHead+''+topicIndex+'" '+
                                 'class="'+this.wordClass+' '+this.weightClass+''+weight+' '+customClass+'" '+
-                                'style="position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;'+dogeCss+'">'+
-                                    '<a href="'+url+'" title="'+title+'" style="'+ dogeColour +'">'+topic.text+'</a>'+
+                                'style="position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;">'+
+                                    '<a href="'+url+'" title="'+title+'">'+topic.text+'</a>'+
                                 '</span>').data(topicData);
 
         if(coords){
