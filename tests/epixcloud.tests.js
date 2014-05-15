@@ -812,6 +812,28 @@ define([
                     expect(cloud.takenSpaces).not.toEqual(ts);
                 });
             });
+
+            describe('autoFit', function(){
+                it('executes autoFit on render by default', function(){
+                    var autoFitStub = sinon.stub(EpixCloud.prototype, 'autoFit');
+
+                    cloud = new EpixCloud({topics: testTopics, $el: $testArea});
+                    cloud.render();
+
+                    expect(autoFitStub.calledOnce).toEqual(true);
+                    autoFitStub.restore();
+                });
+
+                it('does not execute autoFit if the noscale option is passed on initialisation', function(){
+                    var autoFitStub = sinon.stub(EpixCloud.prototype, 'autoFit');
+
+                    cloud = new EpixCloud({topics: testTopics, $el: $testArea, noscale: true});
+                    cloud.render();
+
+                    expect(autoFitStub.calledOnce).toEqual(false);
+                    autoFitStub.restore();
+                });
+            });
         });
 
     });
