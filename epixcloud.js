@@ -5,25 +5,26 @@
  *
  * TOPICS CLOUD, HOOOOOO!
  *
+ * version 0.2
+ *
  * required options:
  *   topics               Array   An array of topic object in the following format:
  *       {
- *         weight         Number  required  any positive value, range is normalised to a linear scale of 0 to 10
- *         text           String  required  the topic text, ideally this should be one or two words
- *         url            String  optional  the URL to apply on the A element wrapping the topic text, defaults to #
- *         title          String  optional  the TITLE attribute to apply to the wrapping A element, defaults to topic text
- *         customClass    String  optional  this string is appended to the class name given to the span representing the topic in the cloud
- *         dataAttributes Object  optional  any data-X attributes that should be applied to the SPAN wrapping the topic.
-                                            Applied as key-value pairs
+ *         weight         Number  required any positive value, range is normalised to a linear scale of 0 to 10
+ *         text           String  required the topic text, ideally this should be one or two words
+ *         url            String  optional the URL to apply on the A element wrapping the topic text, defaults to #
+ *         title          String  optional the TITLE attribute to apply to the wrapping A element, defaults to topic text
+ *         customClass    String  optional this string is appended to the class name given to the span representing the topic in the cloud
+ *         dataAttributes Object  optional any data-X attributes that should be applied to the SPAN wrapping the topic, as key-value pairs
  *       }
- *   $el                  $     The container for the cloud. Must have a defined width and height,
-                                position: relative will be set programatically
+ *   $el                  jQuery  The container for the cloud. Must have a defined width and height, position: relative will be set
  *
  * optional options (!)
  *   wordClass            String  Class name given to all topics in the cloud
  *   weightClass          String  Prepended to the class used for the normalised weight (0 to 10)
  *   idHead               String  The head of the ID for each topic
  *   async                Bool    If set true then the cloud runs asynchronously, but you probably don't need this
+ *   noscale              Bool    If true then the cloud doesn't fit to it's container
  *
  * Example Usage:
  *
@@ -118,11 +119,19 @@ define(['jquery', 'underscore'], function($, _){
 
         this.topics = options.topics;
         this.$el = options.$el;
-        this.$el.css({position:'relative'});
+        this.$el.css({
+            position:'relative',
+            'margin-top': 0,
+            'margin-left': 0,
+            '-webkit-transform': 'scale(1)',
+            '-moz-transform': 'scale(1)',
+            'transform': 'scale(1)'
+        });
 
         this.wordClass = options.wordClass || 'epixword';
         this.weightClass = options.weightClass || 'epixweight-';
         this.idHead = options.idHead || 'epixcloud-';
+        this.noscale = !!options.noscale;
 
         this.init();
     }
@@ -165,14 +174,19 @@ define(['jquery', 'underscore'], function($, _){
         var $m = $('<span class="'+this.wordClass+' '+this.weightClass+''+this.getAdjustedWeight(topic)+'">'+
                         '<a>'+topic.text+'</a>'+
                     '</span>'),
-            w,h;
+            w, h, f;
 
         this.$el.append($m);
         w = $m.outerWidth();
         h = $m.outerHeight();
+        f = $m.css('font-size');
         $m.remove();
 
-        return {width:w,height:h};
+        return {
+            width: w,
+            height: h,
+            fontSize: f
+        };
     };
 
     EpixCloud.prototype.calculateFigureSpace = function(){
@@ -259,6 +273,70 @@ define(['jquery', 'underscore'], function($, _){
         }
     };
 
+    EpixCloud.prototype.getCloudBB = function(){
+        var bb = [Infinity,Infinity,-Infinity,-Infinity]; //[left,top,right,bottom]
+
+        this.$el.find('.' + this.wordClass).each(function(){
+            var $this = $(this),
+                pos = $this.position(),
+                w = $this.outerWidth(),
+                h = $this.outerHeight(),
+                t = pos.top,
+                l = pos.left,
+                r = l + w,
+                b = t + h;
+
+            if(l < bb[0]){
+                bb[0] = l;
+            }
+            if(t < bb[1]){
+                bb[1] = t;
+            }
+            if(r > bb[2]){
+              bb[2] = r;
+            }
+            if(b > bb[3]){
+              bb[3] = b;
+            }
+        });
+
+        return bb;
+    };
+
+    EpixCloud.prototype.autoFit = function(){
+        var allTopicsBB = this.getCloudBB(),
+            diffW = 1, diffH = 1,
+            canvasW = this.$el.outerWidth(),
+            canvasH = this.$el.outerHeight(),
+            boxW = allTopicsBB[2] - allTopicsBB[0],
+            boxH = allTopicsBB[3] - allTopicsBB[1],
+            padding = canvasW > canvasH ? (canvasH * 0.1) : (canvasW * 0.1),
+            leftAdj,
+            topAdj;
+
+        canvasW -= 2*padding;
+        canvasH -= 2*padding;
+        diffW = Math.floor(Math.abs(canvasW / boxW) * 100) / 100;
+        diffH = Math.floor(Math.abs(canvasH / boxH) * 100) / 100;
+        leftAdj = Math.floor(((canvasW - boxW) / 2) - allTopicsBB[0] + padding);
+        topAdj = Math.floor(((canvasH - boxH) / 2) - allTopicsBB[1] + padding);
+
+        // scale
+        this.$el.css({
+          '-webkit-transform': 'scale(' + (diffW > diffH ? diffH : diffW) + ')',
+          '-moz-transform': 'scale(' + (diffW > diffH ? diffH : diffW) + ')',
+          'transform': 'scale(' + (diffW > diffH ? diffH : diffW) + ')'
+        });
+        // center topic by topic
+        this.$el.find('.' + this.wordClass).each(function(){
+            var $topic = $(this);
+            $topic.css({
+                left: parseInt($topic.css('left'), 10) + leftAdj,
+                top: parseInt($topic.css('top'), 10) + topAdj
+            });
+        });
+    };
+
     EpixCloud.prototype.render = function(){
         var self = this;
 
@@ -275,6 +353,11 @@ define(['jquery', 'underscore'], function($, _){
         _(this.topics).each(function(topic,i){
             self.placeTopic(topic,i);
         });
+
+        // cast yon eye o'er the battlefield
+        if(!this.noscale){
+            this.autoFit();
+        }
 
         return this;
     };
