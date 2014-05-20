@@ -159,6 +159,21 @@ define(['jquery', 'underscore'], function($, _){
         });
     }
 
+    function isBoxInCircle(box, containerSize){
+        var radius = Math.floor(_.min(containerSize) / 2),
+            centerX = Math.floor(containerSize[0] / 2),
+            centerY = Math.floor(containerSize[1] / 2);
+
+        return isPointInCircle(centerX, centerY, box[0], box[1], radius) &&
+               isPointInCircle(centerX, centerY, box[0], box[3], radius) &&
+               isPointInCircle(centerX, centerY, box[2], box[1], radius) &&
+               isPointInCircle(centerX, centerY, box[2], box[3], radius);
+    }
+
+    function isBoxInRectangle(box, containerSize){
+        return box[0] > 0 && box[1] > 0 && box[2] < containerSize[0] && box[3] < containerSize[1];
+    }
+
     EpixCloud.prototype.init = function(){
         var self = this;
 
@@ -212,34 +227,19 @@ define(['jquery', 'underscore'], function($, _){
         };
     };
 
+    EpixCloud.prototype.isBoxInContainer = function(box){
+        if(this.circular){
+            return isBoxInCircle(box, this.containerSize);
+        }
+        return isBoxInRectangle(box, this.containerSize);
+    };
+
     EpixCloud.prototype.calculateFigureSpace = function(){
         var self = this;
 
         this.figureSpace = _(this.topics).map(function(topic){
             return self.measureTopicBox(topic);
         });
-    };
-
-    EpixCloud.prototype.isBoxInContainer = function(box){
-        if(this.circular){
-            return this.isBoxInCircle(box);
-        }
-        return this.isBoxInRectangle(box);
-    };
-
-    EpixCloud.prototype.isBoxInCircle = function(box){
-        var radius = Math.floor(_.min(this.containerSize) / 2),
-            centerX = Math.floor(this.containerSize[0] / 2),
-            centerY = Math.floor(this.containerSize[1] / 2);
-
-        return isPointInCircle(centerX, centerY, box[0], box[1], radius) &&
-               isPointInCircle(centerX, centerY, box[0], box[3], radius) &&
-               isPointInCircle(centerX, centerY, box[2], box[1], radius) &&
-               isPointInCircle(centerX, centerY, box[2], box[3], radius);
-    };
-
-    EpixCloud.prototype.isBoxInRectangle = function(box){
-        return box[0] > 0 && box[1] > 0 && box[2] < this.containerSize[0] && box[3] < this.containerSize[1];
     };
 
     EpixCloud.prototype.isSpaceAvailable = function(box){
