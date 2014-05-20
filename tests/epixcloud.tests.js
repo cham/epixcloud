@@ -304,6 +304,26 @@ define([
             });
 
             describe('finding a place for bounding boxes',function(){
+                it('calls isBoxInContainer in order to find a position for each topic', function(){
+                    var inContainerStub = sinon.stub(EpixCloud.prototype, 'isBoxInContainer');
+
+                    cloud = new EpixCloud({topics: [], $el: $('<div style="width:200px;height:200px;"/>')});
+                    cloud.findPlaceForTopic([10,10,150,37],0);
+
+                    expect(inContainerStub.called).toEqual(true);
+                    inContainerStub.restore();
+                });
+
+                it('isBoxInContainer delegates to isBoxInRectangle by default', function(){
+                    var inBoxStub = sinon.stub(EpixCloud.prototype, 'isBoxInRectangle');
+
+                    cloud = new EpixCloud({topics: [], $el: $('<div style="width:200px;height:200px;"/>')});
+                    cloud.isBoxInContainer([10,10,150,37]);
+
+                    expect(inBoxStub.calledOnce).toEqual(true);
+                    inBoxStub.restore();
+                });
+
                 it('correctly finds a place for the first topic passed, starting in the center of the $el',function(){
                     cloud = new EpixCloud({
                         topics: [],
@@ -832,6 +852,41 @@ define([
 
                     expect(autoFitStub.calledOnce).toEqual(false);
                     autoFitStub.restore();
+                });
+            });
+
+            describe('circular rendering', function(){
+                it('isBoxInContainer calls isBoxInCircle if the circle option is set on initialisation', function(){
+                    var circleStub = sinon.stub(EpixCloud.prototype, 'isBoxInCircle');
+
+                    cloud = new EpixCloud({circle: true, topics: [], $el: $('<div style="width:200px;height:200px;"/>')});
+                    cloud.isBoxInContainer([10,10,150,37]);
+
+                    expect(circleStub.calledOnce).toEqual(true);
+                    circleStub.restore();
+                });
+
+                it('does not call isBoxInRectangle if the circle option is set on initialisation', function(){
+                    var rectStub = sinon.stub(EpixCloud.prototype, 'isBoxInRectangle');
+
+                    cloud = new EpixCloud({circle: true, topics: [], $el: $('<div style="width:200px;height:200px;"/>')});
+                    cloud.isBoxInContainer([10,10,150,37]);
+
+                    expect(rectStub.called).toEqual(false);
+                    rectStub.restore();
+                });
+
+                it('resizes the viewport to a square on render if the circle option is set', function(){
+                    $testArea.css({
+                        width: 300,
+                        height: 200
+                    });
+
+                    cloud = new EpixCloud({circle: true, topics: [], $el: $testArea});
+                    cloud.render();
+
+                    expect(cloud.getEl().css('width')).toEqual('200px');
+                    expect(cloud.getEl().css('margin-left')).toEqual('50px');
                 });
             });
         });
